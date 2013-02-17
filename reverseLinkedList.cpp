@@ -33,12 +33,12 @@ class List{
 		void print();
 		void add(int data);
 		void Delete(int data);
+		void reverse();
 };
 
 void List::print(){
 	Node *temp = head;
 	if(temp == NULL){
-            cout<<"\nList empty";
 		return;
 	}
 
@@ -102,6 +102,24 @@ void List::Delete(int data){
 	}
 }
 
+void List::reverse(){
+                     Node *curr = head;
+                     Node *nextt = NULL;
+                     //Node *n3 = NULL;
+                     while(curr->Next() != NULL){
+                                      nextt = curr;
+                                      cout<<nextt->Data()<<"  "<<nextt->Next()<<endl;
+                                      curr = nextt->Next();
+                                      cout<<"cur : "<<curr->Data()<<"  "<<curr->Next()<<"     head    "<<head->Data()<<endl;
+                                      nextt = head->Next();
+                                      head = nextt;
+                                      cout<<"Head : "<<head->Data()<<"  "<<head->Next()<<endl;
+                                      cout<<"Nextt : "<<nextt->Data()<<"  "<<nextt->Next()<<endl;
+                                      cout<<endl;
+                                       
+                              }
+     }
+
 
 
 
@@ -117,6 +135,7 @@ void main(void)
     list.print();
     list.add(300);
     list.print();
+   
     //list.add(60);
     /*list.print();
     list.add(60);
@@ -131,9 +150,11 @@ void main(void)
     list.print();
     list.add(500);
     list.print();
+    cout<<endl;
+    list.reverse();
 
     // Delete nodes from the list
-    list.Delete(400);
+    /*list.Delete(400);
     list.print();;
     list.Delete(300);
     list.print();
@@ -141,7 +162,7 @@ void main(void)
     list.print();
     list.Delete(500);
     list.print();
-    list.Delete(100);
+    list.Delete(100);*/
     list.print();
     getchar();
 }
