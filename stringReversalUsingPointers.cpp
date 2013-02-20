@@ -14,7 +14,7 @@ void reverseWords(char *s)
 {
     char *word_begin = NULL;
     char *temp = s; /* temp is for word boundry */
- 
+    
     /*STEP 1 of the above algorithm */
     while( *temp )
     {
