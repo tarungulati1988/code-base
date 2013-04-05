@@ -1,7 +1,7 @@
 /*
  * Author : Tarun Gulati
  * email : tgulati@indiana.edu, tarun.gulati1988@gmail.com
- * Different methods to reverse a string...hope you enjoy!!! 
+ * Different methods to reverse a string and some string problems...hope you enjoy!!! 
  * 
  * 
  */
@@ -122,6 +122,37 @@ public class stringOperations {
         return string.equals(reversedString);
     }
 	
+	//-------------halfStringReversal-------------------
+	
+	public static String halfStringReversal(String str){
+		String[] temp = str.split("\\.");
+		//System.out.println(temp.length);
+		String tempStr = "";
+		StringBuilder tempBuilder = new StringBuilder();
+		for(int i = 0; i < temp.length; i++){
+			tempStr = stringReversalUsingStringSplit(temp[i]);
+			tempBuilder.append(tempStr);
+			//tempBuilder.append(".");
+			//tempBuilder.replace(tempBuilder.length()-1, tempBuilder.length()-1, ".");
+		}
+		return tempBuilder.toString();
+	}
+	
+	
+	//-----------------subStringStar---------------------------
+	
+	public static String subStringStar(String str){
+		System.out.println(str);
+		StringBuffer sb = new StringBuffer(str);
+		for(int i = 0 ; i < sb.length()-1; i++){
+			if(sb.charAt(i) == sb.charAt(i+1)){
+				sb.insert((i+1), "*");
+				i++;
+			}
+		}
+		return sb.toString();
+	}
+	
 	//-------reverse word helper---------------
 	
 	public static String reverseWord(String str){
@@ -137,6 +168,7 @@ public class stringOperations {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String str1 = "Batman in hindi is fauji ka naukar";
+		String halfSplitStr = "one two three. four five six.";
 		String str2;
 		//method 1
 		str2 = stringReversalUsingBuffer(str1);
@@ -186,6 +218,16 @@ public class stringOperations {
 			System.out.println("Not a pallindrone!!");
 		}
 		
+		str2 = halfStringReversal(halfSplitStr);
+		System.out.println("----------------------------------");
+		System.out.println(halfSplitStr);
+		System.out.println(str2);
+		
+		//hello --> hel*lo
+		//xxyyyyzz -->x*xy*y*y*y*z*z
+		System.out.println("----------------------------------");
+		str2 = subStringStar("xxxyyyyyzzzzzzzz");
+		System.out.println(str2);
 		
 	}
 
