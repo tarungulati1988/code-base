@@ -1,0 +1,179 @@
+{
+    "name": "Actual Game",
+    "sprites": [
+        {
+            "currentCoordinate": {
+                "xPosition": 200,
+                "yPosition": 300
+            },
+            "dx": 1,
+            "dy": -1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {
+                    "{\"objectType\":\"GameLooseEvent\",\"actions\":{\"objectType\":\"ActionList\",\"list\":[{\"objectType\":\"FallThrough\",\"gameStateObj\":\"Game Lose\"}]}}": {
+                        "objectType": "ActionList",
+                        "list": [
+                            {
+                                "objectType": "FallThrough",
+                                "gameStateObj": "Game Lose"
+                            }
+                        ]
+                    },
+                    "{\"objectType\":\"MoveEvent\",\"actions\":{\"objectType\":\"ActionList\",\"list\":[{\"objectType\":\"MoveAction\"}]}}": {
+                        "objectType": "ActionList",
+                        "list": [
+                            {
+                                "objectType": "MoveAction"
+                            }
+                        ]
+                    },
+                    "{\"objectType\":\"CollisionEvent\",\"actions\":{\"objectType\":\"ActionList\",\"list\":[{\"objectType\":\"ReflectAction\"},{\"objectType\":\"VanishAction\",\"gameStateObj\":\"None\"}]},\"sprite1\":null,\"sprite2\":null}": {
+                        "objectType": "ActionList",
+                        "list": [
+                            {
+                                "objectType": "ReflectAction"
+                            }
+                        ]
+                    }
+                }
+            },
+            "height": 32,
+            "imageFileUrl": "./Images/ball.JPG",
+            "initCoordinate": {
+                "xPosition": 200,
+                "yPosition": 300
+            },
+            "name": "ball",
+            "width": 32,
+            "visible": true
+        },
+        {
+            "currentCoordinate": {
+                "xPosition": 400,
+                "yPosition": 0
+            },
+            "dx": 1,
+            "dy": 1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {}
+            },
+            "height": 339,
+            "imageFileUrl": "./Images/brick_tile_bw_vertical.png",
+            "initCoordinate": {
+                "xPosition": 400,
+                "yPosition": 0
+            },
+            "name": "right_wall",
+            "width": 33,
+            "visible": true
+        },
+        {
+            "currentCoordinate": {
+                "xPosition": 240,
+                "yPosition": 50
+            },
+            "dx": 1,
+            "dy": 1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {
+                    "{\"objectType\":\"CollisionEvent\",\"actions\":{\"objectType\":\"ActionList\",\"list\":[{\"objectType\":\"ReflectAction\"},{\"objectType\":\"VanishAction\",\"gameStateObj\":\"None\"}]},\"sprite1\":null,\"sprite2\":null}": {
+                        "objectType": "ActionList",
+                        "list": [
+                            {
+                                "objectType": "VanishAction",
+                                "gameStateObj": "Game Win"
+                            }
+                        ]
+                    }
+                }
+            },
+            "height": 32,
+            "imageFileUrl": "./Images/Brick.png",
+            "initCoordinate": {
+                "xPosition": 240,
+                "yPosition": 50
+            },
+            "name": "brick",
+            "width": 32,
+            "visible": true
+        },
+        {
+            "currentCoordinate": {
+                "xPosition": 0,
+                "yPosition": 0
+            },
+            "dx": 1,
+            "dy": 1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {}
+            },
+            "height": 339,
+            "imageFileUrl": "./Images/brick_tile_bw_vertical.png",
+            "initCoordinate": {
+                "xPosition": 0,
+                "yPosition": 0
+            },
+            "name": "left_wall",
+            "width": 33,
+            "visible": true
+        },
+        {
+            "currentCoordinate": {
+                "xPosition": 40,
+                "yPosition": 0
+            },
+            "dx": 1,
+            "dy": 1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {}
+            },
+            "height": 33,
+            "imageFileUrl": "./Images/brick_tile_bw_horizontal.png",
+            "initCoordinate": {
+                "xPosition": 40,
+                "yPosition": 0
+            },
+            "name": "top_wall",
+            "width": 339,
+            "visible": true
+        },
+        {
+            "currentCoordinate": {
+                "xPosition": 200,
+                "yPosition": 400
+            },
+            "dx": 1,
+            "dy": 1,
+            "eventActionMap": {
+                "objectType": "EventActionMap",
+                "eventActionMap": {
+                    "{\"objectType\":\"KeyPressEvent\",\"actions\":{\"objectType\":\"ActionList\",\"list\":[{\"objectType\":\"MoveLeftAction\"},{\"objectType\":\"MoveRightAction\"}]}}": {
+                        "objectType": "ActionList",
+                        "list": [
+                            {
+                                "objectType": "MoveLeftAction"
+                            },
+                            {
+                                "objectType": "MoveRightAction"
+                            }
+                        ]
+                    }
+                }
+            },
+            "height": 9,
+            "imageFileUrl": "./Images/paddle1.jpg",
+            "initCoordinate": {
+                "xPosition": 200,
+                "yPosition": 400
+            },
+            "name": "paddle",
+            "width": 153,
+            "visible": true
+        }
+    ]
+}

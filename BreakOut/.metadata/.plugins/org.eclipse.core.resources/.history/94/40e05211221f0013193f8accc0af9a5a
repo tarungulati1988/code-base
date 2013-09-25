@@ -1,0 +1,436 @@
+/**
+ * 
+ *	author: Tarun Gulati, tgulati@indiana.edu
+ *          Prashant Chauhan, chauhanp@indiana.edu
+ *          Sidharth Jhawar, sjhawar@indiana.edu
+ *          Pallavi Pudakalakatti, ppudakal@indiana.edu
+ *	Board.java, Aug 29, 2013, 8:12:55 PM	
+ *  BreakOut, com.breakout
+ *
+ */
+package com.breakout;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+@SuppressWarnings("serial")
+public class Board extends JFrame implements Dimensions {
+
+	// Variable Declaration
+	public boolean isFirstTime;
+	public boolean isRunning;
+	public boolean isPaused;
+	public boolean isStopped;
+	public boolean isReplay;
+	public JPanel contentPane;
+	public JPanel panelTop;
+	public JPanel panelBottom;
+	public JPanel panelRight;
+	public JLabel timeLabel;
+	public JLabel msgLabel;
+	public JButton startStopBtn = new JButton("Start");
+	public JButton saveBtn = new JButton("Save");
+	public JButton loadBtn = new JButton("Load");
+	public JButton pausePlayBtn = new JButton("Pause");
+	public JButton undoBtn = new JButton("Undo");
+	public JButton replayBtn = new JButton("Replay");
+	public JButton switchlayoutf = new JButton("Switch to Border Layout");
+	public JButton switchlayoutb = new JButton("Switch to Flow Layout");
+	public Ball ball;
+	public SaveableComposite saveObj;
+	public LoadableComposite loadObj;
+	public Paddle paddle;
+	public Brick brick;
+	public TimerTask timerTask;
+	public GameTimer gameTimer;
+	public PausePlay pausePlayObj;
+	public Undo undoObj;
+	public Replay replayObj;
+	// public HashMap<String, HashMap<Integer, Integer>> replayDS;
+	public ArrayDeque dequeBallX;
+	public ArrayDeque dequeBallY;
+	public ArrayDeque dequePaddleX;
+	public ArrayDeque dequeBallXDir;
+	public ArrayDeque dequeBallYDir;
+	public int bheight;
+	public int bwidth;
+
+	public Board() {
+
+		isRunning = false;
+		isFirstTime = true;
+		isPaused = false;
+		isStopped = false;
+		isReplay = false;
+
+		panelTop = new JPanel();
+		panelBottom = new JPanel();
+		panelRight = new JPanel();
+		timeLabel = new JLabel();
+		msgLabel = new JLabel();
+
+		// paddle = new Paddle();
+		// brick = new Brick();
+		gameTimer = new GameTimer();
+		timerTask = new TimerTask(this);
+		// ball = new Ball(this);
+		saveObj = new SaveableComposite();
+		loadObj = new LoadableComposite();
+
+		// build the main container JFrame
+		setTitle("Break Out Game");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(Dimensions.START_X, Dimensions.START_Y, Dimensions.WIDTH,
+				Dimensions.HEIGHT);
+
+		this.bheight = getHeight();
+		this.bwidth = getWidth();
+		paddle = new Paddle(bheight, bwidth);
+		ball = new Ball(this, bheight, bwidth);
+		brick = new Brick(bheight, bwidth);
+		addComponentListener(new ComponentAdapter() {
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+				bheight = getHeight();
+				bwidth = getWidth();
+				// System.out.print(+Board.bheight);
+				panelTop.setBounds(0, 11, bwidth - 100, bheight - 200);
+				panelBottom.setBounds(0, bheight - 150, bwidth - 100, 70);
+				panelRight.setBounds(bwidth - 90, 11, 60, 70);
+				panelBottom.revalidate();
+				panelTop.revalidate();
+				if (!isReplay) {
+					paddle.set(bheight, bwidth);
+					ball.set(isRunning, bheight, bwidth);
+					brick.set(bheight, bwidth);
+					repaint();
+				}
+
+			}
+		});
+
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+
+		JLayeredPane layeredPane = new JLayeredPane();
+
+		// build the right panel of the JFrame
+		// the ball, paddle and bricks are in this panel
+		contentPane.add(layeredPane, BorderLayout.CENTER);
+		panelTop.setBackground(Color.LIGHT_GRAY);
+		panelTop.setBorder(new LineBorder(new Color(0, 0, 0)));
+		// panelTop.setBounds(0, 11, height, width);
+
+		layeredPane.add(panelTop);
+		panelBottom.setBackground(Color.GRAY);
+		panelBottom.setBorder(new LineBorder(new Color(0, 0, 0)));
+		// panelBottom.setBounds(0, 300, 454, 70);
+		panelRight.setBackground(Color.GRAY);
+		panelRight.setBorder(new LineBorder(new Color(0, 0, 0)));
+
+		layeredPane.add(panelRight);
+
+		// final JPanel f = new JPanel();
+
+		// build the right panel of the JFrame
+		// the timer and the game messages are displayed here
+
+		SetFlowLayout flow = new SetFlowLayout();
+		Context context = new Context(flow);
+		context.executeStrategy(this);
+		final Board b1 = this;
+		// panelLeft.add(switchlayout);
+		switchlayoutf.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				SetBorderLayout border = new SetBorderLayout();
+				Context context = new Context(border);
+				context.executeStrategy(b1);
+				Board.this.requestFocus();
+				panelBottom.revalidate();
+
+			}
+		});
+
+		switchlayoutb.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				SetFlowLayout flow = new SetFlowLayout();
+				Context context = new Context(flow);
+				context.executeStrategy(b1);
+				Board.this.requestFocus();
+				panelBottom.revalidate();
+
+			}
+		});
+
+		layeredPane.add(panelBottom);
+
+		// time label to display the time elapsed since the game starts
+		timeLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+		timeLabel.setText("0:0");
+		panelRight.add(timeLabel);
+
+		// message label to print a message when the game finishes
+		msgLabel.setFont(new Font("SansSerif", Font.BOLD, 10));
+		msgLabel.setForeground(Color.RED);
+		panelRight.add(msgLabel);
+
+		// save button action listener
+		saveBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				timerTask.request(pausePlayObj, Board.this);
+				saveObj.addState(b1);
+				Board.this.requestFocus();
+			}
+		});
+
+		// load button action listener
+		loadBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				// saveObj.addState(b1);
+				timerTask.request(pausePlayObj, Board.this);
+				System.out.println("Load button clicked!!");
+				dequeBallX = new ArrayDeque();
+				dequeBallY = new ArrayDeque();
+				dequePaddleX = new ArrayDeque();
+				dequeBallXDir = new ArrayDeque();
+				dequeBallYDir = new ArrayDeque();
+				System.out.println(dequeBallX);
+				loadObj.removeState(b1);
+
+				Board.this.requestFocus();
+			}
+		});
+
+		addKeyListener(new StrokeAdapter());
+
+		// ActionListener for the start/stop button
+		startStopBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				playSound("btnPlay.wav");
+				if (isFirstTime) {
+					// Register the gameTimer
+					timerTask.register(gameTimer, Board.this);
+
+					// Register ball
+					timerTask.register(ball, Board.this);
+
+					// Register Paddle
+					timerTask.register(paddle, Board.this);
+					// gameTimer.startTime = System.currentTimeMillis();
+					// Trigger the timerTask
+					timerTask.run();
+
+					dequeBallX = new ArrayDeque();
+					dequeBallY = new ArrayDeque();
+					dequePaddleX = new ArrayDeque();
+					dequeBallXDir = new ArrayDeque();
+					dequeBallYDir = new ArrayDeque();
+
+					isRunning = true;
+					isFirstTime = false;
+					// Board.this.setFocusable(true);
+					// timerTask.press(startStopBtn,Board.this);
+					pausePlayBtn.setEnabled(true);
+					Board.this.requestFocus();
+					startStopBtn.setText("Stop");
+				} else if (isRunning == true
+						&& (startStopBtn.getText()).equalsIgnoreCase("Stop")) {
+					isRunning = false;
+					isFirstTime = true;
+					// Board.this.msgLabel.setText("Game Over!");
+					Board.this.timerTask.unRegister(ball);
+					ball.resetState();
+					// Board.this.timerTask.unRegister(paddle);
+					paddle.resetState();
+					Board.this.timerTask.unRegister(gameTimer);
+					// timerTask.
+					gameTimer.resetstate();
+					pausePlayBtn.setEnabled(false);
+					undoBtn.setEnabled(false);
+					startStopBtn.setText("Start");
+					// Board.this.panelTop.removeAll();
+					// Board.this.panelTop.repaint();
+				}
+			}
+		});
+
+		// pause/play button
+
+		pausePlayBtn.setEnabled(false);
+		pausePlayObj = new PausePlay();
+
+		// ActionListener for the pause/play button
+		pausePlayBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				timerTask.request(pausePlayObj, Board.this);
+			}
+		});
+
+		// undo button
+
+		// pausePlayBtn.setBounds(5, 6, 80, 30);
+		undoBtn.setEnabled(false);
+
+		undoObj = new Undo();
+		undoBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				timerTask.request(undoObj, Board.this);
+			}
+		});
+		// undo button
+
+		// pausePlayBtn.setBounds(5, 6, 80, 30);
+		replayBtn.setEnabled(false);
+
+		replayObj = new Replay();
+		// addKeyListener(new StrokeAdapter());
+		replayBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// isRunning=false;
+				isReplay = true;
+				System.out.println(dequeBallX);
+				timerTask.request(replayObj, Board.this);
+			}
+		});
+		// addKeyListener(new StrokeAdapter());
+
+	}
+
+	/**
+	 * Key Listener adapter class
+	 */
+	class StrokeAdapter extends KeyAdapter {
+		public void keyPressed(KeyEvent ke) {
+			int key = ke.getKeyCode();
+
+			/*
+			 * if(key == KeyEvent.VK_SPACE && isFirstTime == true) { //Register
+			 * the gameTimer timerTask.register(gameTimer, Board.this);
+			 * 
+			 * //Register ball timerTask.register(ball, Board.this);
+			 * 
+			 * //Register Paddle timerTask.register(paddle, Board.this);
+			 * gameTimer.startTime = System.currentTimeMillis(); //Trigger the
+			 * timerTask timerTask.run();
+			 * 
+			 * isRunning = true; isFirstTime = false;
+			 * 
+			 * }
+			 */if (key == KeyEvent.VK_LEFT && isRunning == true) {
+				paddle.move("left");
+			} else if (key == KeyEvent.VK_RIGHT && isRunning == true) {
+				paddle.move("right");
+			}
+		}
+
+		public void keyReleased(KeyEvent ke) {
+			if (isRunning == true) {
+				paddle.KeyReleased();
+			}
+		}
+	}
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		Board boardObj;
+		boardObj = new Board();
+		boardObj.setVisible(true);
+		boardObj.setFocusable(true);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.Window#paint(java.awt.Graphics)
+	 */
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+
+		/*
+		 * Paddle fillRect(x, y, width, height)
+		 */
+		g.setColor(Color.BLACK);
+		g.fillRect(paddle.getX(), (int) paddle.getY(), paddle.paddlewidth,
+				paddle.paddleheight);
+		/*
+		 * Ball * fillOval(x, y, width, height)
+		 */
+		g.setColor(Color.RED);
+		g.fillOval(ball.getX(), ball.getY(), ball.ballwidth, ball.ballheight);
+		/*
+		 * Brick fillRect(x, y, width, height)
+		 */
+		g.setColor(Color.BLUE);
+		g.fillRect(brick.getX(), brick.getY(), brick.width, brick.height);
+
+	}
+	
+	public void playSound(String soundName)
+	{
+	try
+	{
+	AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(soundName).getAbsoluteFile( ));
+	Clip clip = AudioSystem.getClip( );
+	clip.open(audioInputStream);
+	clip.start( );
+	}
+	catch(Exception ex)
+	{
+	System.out.println("Error with playing sound.");
+	ex.printStackTrace( );
+	}
+	}
+}
